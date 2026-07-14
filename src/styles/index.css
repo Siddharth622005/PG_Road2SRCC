@@ -1,0 +1,224 @@
+:root {
+  --paper: #FAF9F6;
+  --ink: #1A1A1A;
+  --ink-soft: #5B5B57;
+  --green: #1E6B4F;
+  --green-tint: #E7F1EC;
+  --amber: #B8791F;
+  --amber-tint: #FBF1E1;
+  --border: rgba(0, 0, 0, 0.08);
+  --shadow: 0 8px 24px rgba(26, 26, 26, 0.10);
+  --radius-card: 16px;
+  --radius-btn: 12px;
+  --max-text: 680px;
+  --max-grid: 1120px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+h1 { font-size: 40px; line-height: 1.15; }
+h2 { font-size: 28px; line-height: 1.2; }
+h3 { font-size: 20px; line-height: 1.3; }
+
+@media (max-width: 640px) {
+  h1 { font-size: 30px; }
+  h2 { font-size: 22px; }
+}
+
+p { margin: 0; }
+
+a { color: inherit; text-decoration: none; }
+
+.tabular { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+button { font-family: inherit; cursor: pointer; }
+
+.container {
+  max-width: var(--max-grid);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.text-container {
+  max-width: var(--max-text);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section {
+  padding: 96px 0;
+}
+
+@media (max-width: 640px) {
+  .section { padding: 56px 0; }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-btn);
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 0 24px;
+  height: 52px;
+  transition: transform 150ms ease-out, opacity 150ms ease-out;
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: var(--green);
+  color: #fff;
+}
+
+.btn-primary:hover { opacity: 0.92; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover { background: rgba(0,0,0,0.03); }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--green-tint);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.pill-amber {
+  background: var(--amber-tint);
+  color: var(--amber);
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  transition: box-shadow 150ms ease-out, transform 150ms ease-out;
+}
+
+.card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.caption {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* Nav */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(250, 249, 246, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  max-width: var(--max-grid);
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.logo .dot { color: var(--green); }
+
+.nav-links {
+  display: flex;
+  gap: 28px;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.nav-links a:hover { color: var(--ink); }
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 48px 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+  margin-top: 12px;
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(90deg, #eee 25%, #f5f5f3 37%, #eee 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: var(--radius-card);
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* Sticky contact bar */
+.sticky-contact {
+  position: sticky;
+  bottom: 0;
+  background: var(--paper);
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+
+.sticky-contact .btn { flex: 1; }
+
+@media (min-width: 768px) {
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+}
