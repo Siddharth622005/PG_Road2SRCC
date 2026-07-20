@@ -1,30 +1,63 @@
 # Road2SRCC
 
-A React implementation of the Road2SRCC UX/product design spec — all 8 pages from the sitemap, built with Vite + React Router.
+Road2SRCC is a Vite + React single-page app for browsing verified PG listings near Delhi University colleges. It focuses on student-useful facts: walk time, rent, deposit, room type, food, amenities, house rules, verification notes, real media, and owner contact.
 
 ## What's here
 
-- `/` — Landing
-- `/pgs` — Discovery (all PGs, filterable)
-- `/pg/:slug` — PG Detail
-- `/how-we-verify` — The verification process
-- `/colleges/:college` — College landing page (srcc, hindu, hansraj, kmc, venky, lsr)
-- `/about` — The story
-- `/guide` — Moving to Delhi starter guide
-- `/report` — Report a problem with a listing
+- `/` - Browse all PGs with filters for college, gender, budget, room type, AC, food, and sort order.
+- `/pgs` - Redirects to `/`.
+- `/pg/:slug` - PG detail page with gallery, room-type picker, field notes, evidence, amenities, rules, and owner contact buttons.
+- `/pg/:slug/parents` - Parent-friendly safety and money summary.
+- `/brief` - Short questionnaire to narrow down PG needs.
+- `/shortlist` - Locally saved shortlist of PGs.
+- `/how-we-verify` - Verification process and trust model.
+- `/colleges/:college` - Legacy college URL; redirects to `/?college=:college`.
+- `/about` - Road2SRCC story.
+- `/guide` - Moving to Delhi starter guide.
+- `/report` - Report a problem with a listing.
+- `/status` - Internal listing status page for media and evidence coverage.
 
-Data for PGs and colleges is mock content in `src/data/pgs.js` — swap this for real listings (or a CMS/API) when you're ready.
+## Project structure
 
-**Photos:** every photo slot uses a placeholder component (`src/components/PhotoBox.jsx`) instead of real images, since the design spec calls for real, team-shot photography (no stock photos). Replace `PhotoBox` usages with `<img>` tags pointing at your real photos when you have them — the layout, captions, and "shot by" tags are already wired up.
+```text
+src/
+  App.jsx                 # Routes and app shell
+  main.jsx                # React entry point
+  components/             # Nav, cards, media, evidence chips, footer
+  data/pgs.js             # Colleges, PG listings, room types, evidence data
+  lib/store.js            # localStorage-backed shortlist store
+  pages/                  # Route-level screens
+  styles/index.css        # Global styles
 
-## Run it locally
+public/
+  pg-media/               # Real PG photos and videos used by listings
+  favicon.svg
+  icons.svg
+  _redirects              # Netlify SPA fallback
+
+dist/                     # Production build output
+```
+
+## Data and media
+
+Listing content lives in `src/data/pgs.js`. Media referenced by listings lives in `public/pg-media/` and is served from paths like `/pg-media/example/file.jpg`.
+
+`PhotoBox` supports both real images and placeholder states, so listings can mix complete media with pending media without breaking the layout.
+
+Shortlist state is stored in the browser using localStorage. There is no backend yet.
+
+## Run the frontend locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Opens at http://localhost:5173.
+Vite usually opens at:
+
+```text
+http://localhost:5173/
+```
 
 ## Build for production
 
@@ -32,36 +65,47 @@ Opens at http://localhost:5173.
 npm run build
 ```
 
-Outputs static files to `dist/`. Preview the production build locally with:
+Outputs static files to `dist/`.
+
+Preview the production build locally:
 
 ```bash
 npm run preview
 ```
 
+## Quality checks
+
+```bash
+npm run lint
+npm run build
+```
+
 ## Deploy
 
-This is a static single-page app (SPA) — any static host works. Two easy options:
+This is a static SPA, so any static host works.
 
-### Vercel (recommended, easiest)
+### Vercel
+
 1. Push this folder to a GitHub repo.
-2. Go to vercel.com/new, import the repo.
-3. Vercel auto-detects Vite — framework preset "Vite", build command `npm run build`, output directory `dist`. Click Deploy.
-4. `vercel.json` (already included) handles routing so `/pg/some-slug` works on refresh, not just via in-app navigation.
+2. Import the repo in Vercel.
+3. Use framework preset `Vite`, build command `npm run build`, and output directory `dist`.
+4. `vercel.json` handles SPA routing so direct links like `/pg/some-slug` work on refresh.
 
 ### Netlify
-1. Push to GitHub, then app.netlify.com/start, import the repo.
-2. Build command: `npm run build`. Publish directory: `dist`.
-3. `public/_redirects` (already included) handles SPA routing.
 
-### Any other static host (GitHub Pages, Cloudflare Pages, S3, etc.)
+1. Import the repo in Netlify.
+2. Use build command `npm run build` and publish directory `dist`.
+3. `public/_redirects` handles SPA routing.
+
+### Other static hosts
+
 1. Run `npm run build`.
-2. Upload the contents of `dist/` to your host.
-3. Make sure the host rewrites all unknown paths to `/index.html` (SPA fallback) — otherwise directly visiting `/pg/some-slug` or refreshing on it will 404.
+2. Upload the contents of `dist/`.
+3. Configure unknown routes to rewrite to `/index.html`.
 
-## Next steps toward the real product
+## Next steps
 
-- Replace mock data in `src/data/pgs.js` with real listings (or wire up a small backend/CMS).
-- Replace `PhotoBox` placeholders with real photos per the spec's photography rules (section 9 of the design doc): natural daylight, always include desk + bathroom, consistent warm edit.
-- Wire the Report form to actually send somewhere (email, a form service like Formspree, or a small API route).
-- Add the "notify me" capture for uncovered colleges (empty state in `CollegeLanding.jsx`).
-- Consider a stale-badge recheck cadence job once you have more listings (the `stale` field on each PG already drives the amber badge).
+- Wire the report form to email, Formspree, or an API route.
+- Add a backend or CMS when listings need to be edited outside code.
+- Add capture for uncovered colleges or unavailable room types.
+- Add a recheck workflow for stale listings and price confirmations.
