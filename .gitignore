@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Raw camera originals are kept locally; the app uses converted web assets.
+*.MOV
+*.HEIC
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

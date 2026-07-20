@@ -1,19 +1,29 @@
-// Real deployments should replace this with actual team-shot photography.
-// This renders a consistent warm placeholder so layout/spacing reads correctly.
-export default function PhotoBox({ ratio = '4 / 3', label, caption, tag }) {
+// Renders a real team-shot photo when `src` is given. Falls back to a warm
+// placeholder gradient (unphotographed rooms, static-map slots, etc.) so
+// layout/spacing still reads correctly before real photography exists.
+export default function PhotoBox({ ratio = '4 / 3', label, caption, tag, src }) {
   return (
     <div style={{ position: 'relative', width: '100%', aspectRatio: ratio, borderRadius: 12, overflow: 'hidden' }}>
-      <div
-        style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(135deg, #EFE8DC 0%, #E4D9C6 50%, #D8CBAF 100%)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}
-      >
-        <span style={{ color: '#9C8F78', fontSize: 13, fontWeight: 600, textAlign: 'center', padding: 16 }}>
-          {label || 'Photo'}
-        </span>
-      </div>
+      {src ? (
+        <img
+          src={src}
+          alt={caption || label || ''}
+          loading="lazy"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      ) : (
+        <div
+          style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(135deg, #EFE8DC 0%, #E4D9C6 50%, #D8CBAF 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <span style={{ color: '#9C8F78', fontSize: 13, fontWeight: 600, textAlign: 'center', padding: 16 }}>
+            {label || 'Photo'}
+          </span>
+        </div>
+      )}
       {tag && (
         <span style={{
           position: 'absolute', left: 10, bottom: 10, background: 'rgba(26,26,26,0.72)', color: '#fff',

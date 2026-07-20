@@ -1,39 +1,50 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { CheckCircle2, Footprints, Phone, MessageCircle, Share2, X, Check } from 'lucide-react';
-import { getPg, getCollege } from '../data/pgs';
+import {
+  CheckCircle2, Footprints, Phone, MessageCircle, X, Check,
+  Bookmark, BookmarkCheck,
+} from 'lucide-react';
+import { getPg, getCollege, daysSince } from '../data/pgs';
+import { useShortlist } from '../lib/store';
 import PhotoBox from '../components/PhotoBox';
+import EvidenceChip from '../components/EvidenceChip';
 
 export default function PGDetail() {
   const { slug } = useParams();
   const pg = getPg(slug);
-  const [showVerifySheet, setShowVerifySheet] = useState(false);
   const [showAllChecks, setShowAllChecks] = useState(false);
+  const [roomTypeId, setRoomTypeId] = useState(pg?.roomTypes ? pg.roomTypes[0].id : null);
+  const shortlist = useShortlist();
 
   if (!pg) {
     return (
       <div className="section container text-container" style={{ textAlign: 'center' }}>
         <h2>This PG isn't listed anymore — usually means it filled up or stopped meeting our checks.</h2>
-        <Link to="/pgs" className="btn btn-primary" style={{ marginTop: 24, display: 'inline-flex' }}>
-          See PGs near the same college
+        <Link to="/" className="btn btn-primary" style={{ marginTop: 24, display: 'inline-flex' }}>
+          Browse all PGs
         </Link>
       </div>
     );
   }
 
-  const monthlyTotal = pg.price + (pg.extras || 0);
-  const waMessage = encodeURIComponent(`Hi, I found ${pg.name} on Road2SRCC…`);
-  const visibleChecks = showAllChecks ? pg.checklist : pg.checklist.slice(0, 4);
+  // A listing with multiple room types picks one to drive price, deposit,
+  // sharing text, and photos — everything else on the page (checks, rules,
+  // amenities, building photos) is shared. Some tiers are a range (owner
+  // gave "₹19,000–22,000") rather than an exact figure.
+  const formatPrice = (rt) => rt.priceMax
+    ? `₹${rt.price.toLocaleString('en-IN')}–${rt.priceMax.toLocaleString('en-IN')}`
+    : `₹${rt.price.toLocaleString('en-IN')}`;
+  const roomType = pg.roomTypes ? pg.roomTypes.find((rt) => rt.id === roomTypeId) : null;
+  const effectivePrice = roomType ? roomType.price : pg.price;
+  const effectiveDeposit = roomType ? roomType.deposit : pg.deposit;
+  const effectiveSharing = roomType ? roomType.label.toLowerCase() : pg.sharing;
 
-  function shareLink() {
-    const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({ title: pg.name, text: 'Found this verified PG on Road2SRCC — sending to you.', url });
-    } else {
-      navigator.clipboard.writeText(url);
-      alert('Link copied — send it to your parents on WhatsApp.');
-    }
-  }
+  const monthlyTotal = effectivePrice + (pg.extras || 0);
+  const firstMonthTotal = monthlyTotal + effectiveDeposit;
+  const waMessage = encodeURIComponent(`Hi, I found ${pg.name} on Road2SRCC…`);
+  const visibleChecks = showAllChecks ? pg.checks : pg.checks.slice(0, 5);
+  const saved = shortlist.has(pg.slug);
+  const priceDays = daysSince(pg.priceConfirmed);
 
   return (
     <div style={{ paddingBottom: 88 }}>
@@ -41,9 +52,30 @@ export default function PGDetail() {
       <div className="container" style={{ paddingTop: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 12 }}>
           {pg.photos.map((photo, i) => (
-            <PhotoBox key={i} ratio="4 / 3" label={pg.name} caption={photo.caption} tag={i === 0 ? `📷 Shot by Road2SRCC · ${pg.verifiedDate.split(' ').slice(1).join(' ')}` : undefined} />
+            <PhotoBox
+              key={i}
+              ratio="4 / 3"
+              label={pg.name}
+              caption={photo.caption}
+              src={photo.src}
+              tag={i === 0 && photo.src
+                ? (pg.photosOwnerSupplied
+                  ? `📷 Provided by the owner — not independently shot by us`
+                  : `📷 Shot by Road2SRCC · ${pg.verifiedDate.split(' ').slice(1).join(' ')}`)
+                : undefined}
+            />
           ))}
         </div>
+        {pg.videos && pg.videos.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px,1fr))', gap: 12, marginTop: 12 }}>
+            {pg.videos.map((v, i) => (
+              <div key={i}>
+                <video src={v.src} controls preload="metadata" style={{ width: '100%', borderRadius: 12, display: 'block', background: '#000' }} />
+                <p className="caption" style={{ marginTop: 6 }}>{v.caption}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="text-container" style={{ marginTop: 32 }}>
@@ -53,17 +85,53 @@ export default function PGDetail() {
             <h1 style={{ fontSize: 28 }}>{pg.name}</h1>
             <p style={{ color: 'var(--ink-soft)', marginTop: 4 }}>{pg.area} · {pg.gender}</p>
           </div>
-          <button className={`pill ${pg.stale ? 'pill-amber' : ''}`} style={{ border: 'none' }} onClick={() => setShowVerifySheet(true)}>
-            <CheckCircle2 size={14} /> Visited by us · {pg.verifiedDate}
+          <button
+            className={`btn ${saved ? 'btn-primary' : 'btn-ghost'}`}
+            style={{ height: 44, fontSize: 14 }}
+            onClick={() => shortlist.toggle(pg.slug)}
+          >
+            {saved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+            {saved ? 'On your shortlist' : 'Add to shortlist'}
           </button>
         </div>
 
+        {/* Verification state, as a sentence */}
+        <p style={{ marginTop: 12, fontSize: 15, color: 'var(--ink-soft)', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <CheckCircle2 size={16} color="var(--green)" style={{ flexShrink: 0 }} />
+          <span>
+            Visited by <strong style={{ color: 'var(--ink)' }}>{pg.verifierNote}</strong> on {pg.verifiedDate} · price confirmed by owner{' '}
+            {priceDays === 0 ? 'today' : priceDays === 1 ? 'yesterday' : `${priceDays} days ago`}
+          </span>
+        </p>
+
+        {/* Room type picker — only for listings with more than one room type */}
+        {pg.roomTypes && (
+          <div style={{ marginTop: 20 }}>
+            <p className="caption">{pg.roomTypes.length} room types under one roof — pick one</p>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+              {pg.roomTypes.map((rt) => (
+                <button
+                  key={rt.id}
+                  className={`btn ${rt.id === roomTypeId ? 'btn-primary' : 'btn-ghost'}`}
+                  style={{ height: 44, fontSize: 14 }}
+                  onClick={() => setRoomTypeId(rt.id)}
+                >
+                  {rt.label} · {formatPrice(rt)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Three answers card */}
-        <div className="card" style={{ padding: 24, marginTop: 24 }}>
+        <div className="card" style={{ padding: 24, marginTop: pg.roomTypes ? 12 : 20 }}>
           <p className="tabular" style={{ fontSize: 22 }}>
-            ₹{pg.price.toLocaleString('en-IN')}/month · {pg.sharing} · ₹{pg.deposit.toLocaleString('en-IN')} deposit · {pg.foodIncluded ? 'food included' : 'no food'}
+            {roomType ? formatPrice(roomType) : `₹${effectivePrice.toLocaleString('en-IN')}`}/month · {effectiveSharing} · ₹{effectiveDeposit.toLocaleString('en-IN')} deposit · {pg.foodIncluded ? 'food included' : 'no food'}
           </p>
-          <p style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+          {roomType?.priceMax && (
+            <p className="caption" style={{ marginTop: 4 }}>Owner gave this as a range, not a fixed price — confirm the exact number for your specific room.</p>
+          )}
+          <p style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <Footprints size={18} />
             {pg.colleges.map((c, i) => (
               <span key={c.slug}>
@@ -71,17 +139,39 @@ export default function PGDetail() {
               </span>
             ))}
           </p>
-          <p style={{ marginTop: 8, color: 'var(--ink-soft)' }}>
-            Warden on site · CCTV at entrance · {pg.rules[0]}
-          </p>
           <p className="tabular" style={{ marginTop: 16, fontSize: 15, color: 'var(--green)' }}>
-            What you'll actually pay per month: ~₹{monthlyTotal.toLocaleString('en-IN')}
+            What you'll actually pay per month: ~₹{monthlyTotal.toLocaleString('en-IN')} · first month: ~₹{firstMonthTotal.toLocaleString('en-IN')} (incl. deposit)
           </p>
         </div>
+
+        {/* Room-type-specific photos and video */}
+        {roomType && (
+          <div style={{ marginTop: 24 }}>
+            {roomType.photos.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 12 }}>
+                {roomType.photos.map((photo, i) => (
+                  <PhotoBox key={i} ratio="4 / 3" label={roomType.label} caption={photo.caption} src={photo.src} />
+                ))}
+              </div>
+            )}
+            {roomType.videos && roomType.videos.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px,1fr))', gap: 12, marginTop: roomType.photos.length > 0 ? 12 : 0 }}>
+                {roomType.videos.map((v, i) => (
+                  <div key={i}>
+                    <video src={v.src} controls preload="metadata" style={{ width: '100%', borderRadius: 12, display: 'block', background: '#000' }} />
+                    <p className="caption" style={{ marginTop: 6 }}>{v.caption}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            <p className="caption" style={{ marginTop: 8 }}>{roomType.note}</p>
+          </div>
+        )}
 
         {/* Field notes */}
         <div style={{ marginTop: 40 }}>
           <h3>Our field notes</h3>
+          <p className="caption" style={{ marginTop: 4 }}>Written by {pg.verifierNote} during the visit. Unedited.</p>
           <ul style={{ marginTop: 12, paddingLeft: 20 }}>
             {pg.fieldNotes.map((note, i) => (
               <li key={i} style={{ marginBottom: 8, color: 'var(--ink-soft)' }}>{note}</li>
@@ -89,19 +179,15 @@ export default function PGDetail() {
           </ul>
         </div>
 
-        {/* What we checked */}
+        {/* What we checked — every check opens its evidence */}
         <div style={{ marginTop: 40 }}>
-          <h3>What we checked</h3>
+          <h3>What we checked — tap any check to see the evidence</h3>
           <div style={{ marginTop: 12 }}>
-            {visibleChecks.map((check, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', color: 'var(--ink-soft)' }}>
-                <Check size={16} color="var(--green)" /> {check}
-              </div>
-            ))}
+            {visibleChecks.map((check) => <EvidenceChip key={check.label} check={check} />)}
           </div>
-          {!showAllChecks && pg.checklist.length > 4 && (
-            <button className="btn btn-ghost" style={{ height: 36, fontSize: 14, marginTop: 8 }} onClick={() => setShowAllChecks(true)}>
-              See all {pg.checklist.length}
+          {!showAllChecks && pg.checks.length > 5 && (
+            <button className="btn btn-ghost" style={{ height: 36, fontSize: 14, marginTop: 12 }} onClick={() => setShowAllChecks(true)}>
+              See all {pg.checks.length} checks
             </button>
           )}
         </div>
@@ -128,9 +214,6 @@ export default function PGDetail() {
           <ul style={{ marginTop: 8, paddingLeft: 20 }}>
             {pg.nearby.map((n, i) => <li key={i} style={{ color: 'var(--ink-soft)', marginBottom: 4 }}>{n}</li>)}
           </ul>
-          <div style={{ marginTop: 12 }}>
-            <PhotoBox ratio="16 / 9" label="Static map — tap to open in Google Maps" />
-          </div>
         </div>
 
         {/* House rules */}
@@ -142,12 +225,12 @@ export default function PGDetail() {
           </ul>
         </div>
 
-        <button className="btn btn-ghost" style={{ marginTop: 40, height: 44 }} onClick={shareLink}>
-          <Share2 size={16} /> Send to your parents
-        </button>
+        <Link to={`/pg/${pg.slug}/parents`} className="btn btn-ghost" style={{ marginTop: 40, height: 44, display: 'inline-flex' }}>
+          Parent view — safety &amp; money summary, हिंदी में भी
+        </Link>
 
-        <p style={{ marginTop: 40, color: 'var(--ink-soft)', fontSize: 14 }}>
-          Talk directly to the owner. We take no commission — from you or them. Visit before you pay anything.
+        <p style={{ marginTop: 24, color: 'var(--ink-soft)', fontSize: 14 }}>
+          Talk directly to the owner. Visit before you pay anything, and take a receipt for every rupee.
         </p>
       </div>
 
@@ -160,26 +243,6 @@ export default function PGDetail() {
           <MessageCircle size={18} /> WhatsApp
         </a>
       </div>
-
-      {/* Verification sheet */}
-      {showVerifySheet && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 30, display: 'flex', alignItems: 'flex-end' }} onClick={() => setShowVerifySheet(false)}>
-          <div className="card" style={{ width: '100%', maxWidth: 640, margin: '0 auto', borderRadius: '16px 16px 0 0', padding: 24 }} onClick={(e) => e.stopPropagation()}>
-            <h3>Visited by {pg.verifiedBy} on {pg.verifiedDate}</h3>
-            <p style={{ marginTop: 12, color: 'var(--ink-soft)' }}>
-              We visit every PG unannounced, talk to current residents, and check the full list below before listing anything.
-            </p>
-            <div style={{ marginTop: 16 }}>
-              {pg.checklist.map((check, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0' }}>
-                  <Check size={16} color="var(--green)" /> {check}
-                </div>
-              ))}
-            </div>
-            <button className="btn btn-ghost" style={{ marginTop: 20 }} onClick={() => setShowVerifySheet(false)}>Close</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

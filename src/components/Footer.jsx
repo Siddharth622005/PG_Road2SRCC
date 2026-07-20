@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <div className="footer">
       <div className="container">
-        <p>Road2SRCC is free and independent. PG owners don't pay us for placement.</p>
+        <p>Road2SRCC is free for students. Every PG here was visited by us in person, and listings are shown neutrally — no rankings, no paid placement in ordering.</p>
         <div className="footer-links">
           <Link to="/report">Report a listing</Link>
           <a href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a>

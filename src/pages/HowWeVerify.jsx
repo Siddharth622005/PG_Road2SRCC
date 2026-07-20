@@ -33,7 +33,8 @@ export default function HowWeVerify() {
       <div className="text-container">
         <h1>What we check before listing anything</h1>
         <p style={{ marginTop: 16, color: 'var(--ink-soft)', fontSize: 18 }}>
-          We visited 74 PGs. We listed 31. The other 43 didn't pass — that's the point.
+          Every PG on this site was visited by us, in person. What we saw ourselves is marked as
+          evidence; what an owner told us is always labelled as exactly that.
         </p>
 
         <div style={{ marginTop: 48, display: 'flex', flexDirection: 'column', gap: 40 }}>
@@ -52,7 +53,7 @@ export default function HowWeVerify() {
 
         <div style={{ marginTop: 56 }}>
           <h2>The full checklist</h2>
-          <p style={{ marginTop: 8, color: 'var(--ink-soft)' }}>Every listing on Road2SRCC passes all 12 of these before it goes live.</p>
+          <p style={{ marginTop: 8, color: 'var(--ink-soft)' }}>What we work through on every visit. Each listing's page shows exactly which of these we've completed there so far.</p>
           <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: '8px 16px' }}>
             {checklist.map((c, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--ink-soft)' }}>
