@@ -190,7 +190,7 @@ const stayEazeRoomTypes = [
 ];
 
 const stayEazeRules = [
-  '9pm gate close — but the owner separately said parents\' approval is needed for entry after 9:30pm. We haven\'t resolved this apparent inconsistency yet; confirm the actual curfew before relying on either time.',
+  '9:30pm gate close.',
   'Parents allowed: only mother, per the owner. Friends allowed: only female, common area only. Overnight guests: only female, ₹750/night.',
   '11-month lock-in and 11-month notice period. Breaking the lock-in forfeits the entire deposit — stricter than most PGs on this site, where usually only part of the deposit is at risk for early exit.',
   'Deposit is 1 month\'s rent, refundable after 11 months. Any broken fixtures are deducted from it.',
@@ -203,6 +203,7 @@ const stayEazeFieldNotes = [
   'We shot the building front, eating area, terrace, lobby, and a double-sharing room ourselves, and tasted the food directly — quality was good. Rules, safety claims, and amenities are still what the owner told us; we haven\'t independently confirmed those with residents yet. Room photos/video for single occupancy aren\'t available yet.',
   '⚠️ The two "student testimonial" videos on this page were provided by the owner, not recorded by us — treat them as marketing content, not independent verification. We haven\'t talked to a current resident ourselves yet.',
   '⚠️ Backup electricity only covers common areas, not rooms — if the power goes out, your room has no backup, per the owner. Fridge and RO water are also only on the ground floor, not every floor.',
+  'Food: 4 home-cooked meals a day. We tasted it ourselves during the visit — quality was good.',
   'Owner says: operating since June 2025, ~50 students currently. Most residents come from DRC, SRCC, and Miranda House — plus somewhere the owner called "Vajiro institute," which we haven\'t been able to match to a real college yet. Ask us if you want us to follow up on that.',
   'Single and double rooms are both priced as a range (Double ₹16,000–20,000; Single ₹26,000–36,000) — the exact price depends on the specific room. Confirm the exact number before committing.',
   'Deposit is only 1 month\'s rent (lower than most PGs here), but breaking the 11-month lock-in forfeits all of it, not just part — a stricter tradeoff than it first looks.',
