@@ -1,15 +1,10 @@
 import { Link } from 'react-router-dom';
-import PhotoBox from '../components/PhotoBox';
 
 export default function About() {
   return (
     <div className="section">
       <div className="text-container">
         <h1>I paid for a room I'd never seen.</h1>
-
-        <div style={{ marginTop: 32 }}>
-          <PhotoBox ratio="16 / 10" label="Founder photo" />
-        </div>
 
         <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 20, fontSize: 17 }}>
           <p>

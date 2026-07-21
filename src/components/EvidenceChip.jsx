@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { freshness, daysSince } from '../data/pgs';
+import MutedVideo from './MutedVideo';
 
 // A claim you can tap to see its receipt. Fresh facts print dark; aging facts fade.
 export default function EvidenceChip({ check }) {
@@ -29,7 +30,7 @@ export default function EvidenceChip({ check }) {
           {check.media && (
             <div style={{ marginTop: 10, maxWidth: 360, borderRadius: 10, overflow: 'hidden' }}>
               {check.media.type === 'video' ? (
-                <video src={check.media.src} controls preload="metadata" style={{ width: '100%', display: 'block' }} />
+                <MutedVideo src={check.media.src} preload="metadata" style={{ width: '100%', display: 'block' }} />
               ) : (
                 <img src={check.media.src} alt={check.label} style={{ width: '100%', display: 'block' }} />
               )}

@@ -7,7 +7,9 @@ export default function Nav() {
   return (
     <div className="nav">
       <div className="nav-inner">
-        <Link to="/" className="logo">Road2SRCC<span className="dot">.</span></Link>
+        <Link to="/" className="logo">
+          <img src="/brand/logo.png" alt="Road2SRCC" />
+        </Link>
         <div className="nav-links" style={{ alignItems: 'center' }}>
           <Link to="/how-we-verify">How we verify</Link>
           <Link to="/about">About</Link>

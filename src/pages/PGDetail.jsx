@@ -8,6 +8,7 @@ import { getPg, getCollege, daysSince } from '../data/pgs';
 import { useShortlist } from '../lib/store';
 import PhotoBox from '../components/PhotoBox';
 import EvidenceChip from '../components/EvidenceChip';
+import MutedVideo from '../components/MutedVideo';
 
 export default function PGDetail() {
   const { slug } = useParams();
@@ -70,7 +71,7 @@ export default function PGDetail() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px,1fr))', gap: 12, marginTop: 12 }}>
             {pg.videos.map((v, i) => (
               <div key={i}>
-                <video src={v.src} controls preload="metadata" style={{ width: '100%', borderRadius: 12, display: 'block', background: '#000' }} />
+                <MutedVideo src={v.src} preload="metadata" style={{ width: '100%', borderRadius: 12, display: 'block', background: '#000' }} />
                 <p className="caption" style={{ marginTop: 6 }}>{v.caption}</p>
               </div>
             ))}
@@ -158,7 +159,7 @@ export default function PGDetail() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px,1fr))', gap: 12, marginTop: roomType.photos.length > 0 ? 12 : 0 }}>
                 {roomType.videos.map((v, i) => (
                   <div key={i}>
-                    <video src={v.src} controls preload="metadata" style={{ width: '100%', borderRadius: 12, display: 'block', background: '#000' }} />
+                    <MutedVideo src={v.src} preload="metadata" style={{ width: '100%', borderRadius: 12, display: 'block', background: '#000' }} />
                     <p className="caption" style={{ marginTop: 6 }}>{v.caption}</p>
                   </div>
                 ))}
